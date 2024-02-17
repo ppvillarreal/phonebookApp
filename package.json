@@ -11,6 +11,8 @@
   "author": "ppvillarreal",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.515.0",
+    "@aws/dynamodb-data-mapper": "^0.7.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "morgan": "^1.10.0"

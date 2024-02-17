@@ -1,10 +1,17 @@
 const express = require('express')
-const app = express()
 const cors = require('cors')
+const { DynamoDB } = require('@aws-sdk/client-dynamodb');
+const { DataMapper } = require('@aws/dynamodb-data-mapper');
+const Contact = require('./DynamoDBContactMapping');
+
+const app = express()
+
+// Initialize DynamoDB client and DataMapper
+const client = new DynamoDB({ region: process.env.SERVICE_REGION });
+const mapper = new DataMapper({ client });
 
 app.use(cors())
 var morgan = require('morgan')
-
 app.use(express.json());
 
 morgan.token('body', function getBody (request) {
@@ -12,92 +19,69 @@ morgan.token('body', function getBody (request) {
 })
 app.use(morgan(':method :url :status :response-time :body'))
 
-let phonebook = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
-
 const ID_LENGTH = 1000000000;
 
-const generateId = () => {
-    return Math.floor(Math.random() * ID_LENGTH) + 1;
-}
-
 app.get('/info', (request, response) => {
-    const message = 
-        `<p>Phonebook has info for ${phonebook.length} people</p>` +
-        `<p> ${new Date()} </p>`
-    response.send(message)
+  let count = 0;
+  for await (const _ of mapper.scan(Contact, { 
+      projection: ['id'] 
+  })) {
+      count++;
+  }
+  const message = 
+      `<p>Phonebook has info for ${count} people</p>` +
+      `<p> ${new Date()} </p>`;
+  response.send(message);
 })
 
 app.get('/api/phonebook', (request, response) => {
+  const contacts = [];
+    for await (const contact of mapper.scan(Contact)) {
+        contacts.push(contact);
+    }
   response.json(phonebook)
 })
 
 app.get('/api/phonebook/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const contact = phonebook.find(contact => contact.id === id)
-    
-    if (contact) {
-      response.json(contact)
-    } else {
-      response.status(404).end()
-    }
-  })
+  const id = request.params.id;
+  mapper.get(Object.assign(new Contact(), { id }))
+      .then(contact => {
+          response.json(contact);
+      })
+      .catch(error => {
+          response.status(404).send({ error: 'Not found' });
+      });
+});
 
 app.delete('/api/phonebook/:id', (request, response) => {
-    const id = Number(request.params.id)
-    phonebook = phonebook.filter(contact => contact.id !== id)
-  
-    response.status(204).end()
+  const id = req.params.id;
+  mapper.delete(Object.assign(new Contact(), { id }))
+      .then(() => {
+          res.status(204).end(); // Successfully deleted the item
+      })
+      .catch((error) => {
+          res.status(404).send({ error: 'Not found' });
+      });
 })
   
 app.post('/api/phonebook', (request, response) => {
-    console.log(request.body)
-    const body = request.body
-    console.log(body)
-    if (!body.name) {
-      return response.status(400).json({ 
-        error: 'name missing' 
-      })
-    } else if (!body.number) {
-      return response.status(400).json({ 
-        error: 'number missing' 
-      })
-    } else if (phonebook.find(contact => contact.name === body.name)){
-       return response.status(400).json({ 
-         error: 'name already exists' 
-       })
-    }
+  const { name, number } = request.body;
+  if (!name || !number) {
+      return response.status(400).json({ error: 'name or number missing' });
+  }
 
-    const contact = {
-      name: body.name,
-      number: body.number,
-      id: generateId(),
-    }
-  
-    phonebook = phonebook.concat(contact)
-  
-    response.json(contact)
-})
+  const contact = new Contact();
+  contact.name = name;
+  contact.number = number;
+
+  mapper.put(contact)
+      .then(() => {
+          response.json(contact); // Successfully added the contact
+      })
+      .catch((error) => {
+          response.status(500).send({ error: 'Error adding contact' }); 
+      });
+});
 
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
