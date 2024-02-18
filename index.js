@@ -21,7 +21,7 @@ app.use(morgan(':method :url :status :response-time :body'))
 
 const ID_LENGTH = 1000000000;
 
-app.get('/info', (request, response) => {
+app.get('/info', async (request, response) => {
   let count = 0;
   for await (const _ of mapper.scan(Contact, { 
       projection: ['id'] 
