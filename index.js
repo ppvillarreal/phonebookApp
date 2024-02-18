@@ -34,7 +34,7 @@ app.get('/info', (request, response) => {
   response.send(message);
 })
 
-app.get('/api/phonebook', (request, response) => {
+app.get('/api/phonebook', async (request, response) => {
   const contacts = [];
     for await (const contact of mapper.scan(Contact)) {
         contacts.push(contact);
@@ -42,7 +42,7 @@ app.get('/api/phonebook', (request, response) => {
   response.json(phonebook)
 })
 
-app.get('/api/phonebook/:id', (request, response) => {
+app.get('/api/phonebook/:id', async (request, response) => {
   const id = request.params.id;
   mapper.get(Object.assign(new Contact(), { id }))
       .then(contact => {
