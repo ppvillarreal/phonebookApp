@@ -73,7 +73,7 @@ app.post('/api/phonebook', (request: Request, response: Response): void => {
       return;
   }
 
-  const contact = new Contact();
+  const contact: Contact = new Contact();
   contact.name = name;
   contact.number = number;
 
