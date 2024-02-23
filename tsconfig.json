@@ -107,10 +107,11 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "include": [
-    "**/*" // Include all files in the src folder.
+    "src/**/*" // Include all files in the src folder.
   ],
   "exclude": [
     "node_modules", // Exclude the node_modules directory.
+    "dist",
     "**/*.spec.ts" // Exclude test files.
   ]
 }
