@@ -19,6 +19,10 @@ interface ContactRequestBody {
     number: string;
 }
 
+interface ErrorResponse {
+    error: string;
+}
+
 app.get('/info', async (_request: Request, response: Response): Promise<void> => {
   let count = 0;
   for await (const _ of mapper.scan(Contact, { 
@@ -33,7 +37,7 @@ app.get('/info', async (_request: Request, response: Response): Promise<void> =>
 })
 
 app.get('/api/phonebook', async (_request: Request, response: Response): Promise<void>  => {
-  const contacts = [];
+  const contacts: Contact[] = [];
     for await (const contact of mapper.scan(Contact)) {
         contacts.push(contact);
     }
@@ -47,7 +51,7 @@ app.get('/api/phonebook/:id', (request: Request, response: Response): void => {
           response.json(contact);
       })
       .catch(_error => {
-          response.status(404).send({ error: 'Not found' });
+          response.status(404).send({ error: 'Not found' } as ErrorResponse);
       });
 });
 
@@ -58,14 +62,14 @@ app.delete('/api/phonebook/:id', (request: Request, response: Response): void =>
           response.status(204).end(); // Successfully deleted the item
       })
       .catch((_error) => {
-          response.status(404).send({ error: 'Not found' });
+          response.status(404).send({ error: 'Not found' } as ErrorResponse);
       });
 })
   
 app.post('/api/phonebook', (request: Request, response: Response): void => {
   const { name, number } = request.body as ContactRequestBody;
   if (!name || !number) {
-      response.status(400).json({ error: 'name or number missing' });
+      response.status(400).json({ error: 'name or number missing' } as ErrorResponse);
       return;
   }
 
@@ -78,12 +82,12 @@ app.post('/api/phonebook', (request: Request, response: Response): void => {
           response.json(contact); // Successfully added the contact
       })
       .catch((_error) => {
-          response.status(500).send({ error: 'Error adding contact' }); 
+          response.status(500).send({ error: 'Error adding contact' } as ErrorResponse); 
       });
 });
 
-const unknownEndpoint = (_request: Request, response: Response) => {
-    response.status(404).send({ error: 'unknown endpoint' })
+const unknownEndpoint = (_request: Request, response: Response): void => {
+    response.status(404).send({ error: 'unknown endpoint' } as ErrorResponse)
 }
   
 app.use(unknownEndpoint)
