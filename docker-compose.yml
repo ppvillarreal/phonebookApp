@@ -22,5 +22,5 @@ services:
       - localEnvNetwork
 
 networks:
-  mynetwork:
+  localEnvNetwork:
     driver: bridge
