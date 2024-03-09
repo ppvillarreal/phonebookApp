@@ -4,7 +4,7 @@ interface Config {
 }
 
 // Check if the environment is development
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment: boolean = process.env.NODE_ENV === 'development';
 
 // Set default values for local development
 const defaultConfig: Config = {
@@ -14,8 +14,8 @@ const defaultConfig: Config = {
 
 // Assign environment variables or use default values for local development
 const config: Config = {
-  dynamoDbTableName: isDevelopment ? defaultConfig.dynamoDbTableName : process.env.DYNAMODB_TABLE_NAME as string,
-  serviceRegion: isDevelopment ? defaultConfig.serviceRegion : process.env.SERVICE_REGION as string,
+  dynamoDbTableName: isDevelopment ? defaultConfig.dynamoDbTableName : (process.env.DYNAMODB_TABLE_NAME as string),
+  serviceRegion: isDevelopment ? defaultConfig.serviceRegion : (process.env.SERVICE_REGION as string),
 };
 
 // Runtime validation to ensure necessary environment variables are set
