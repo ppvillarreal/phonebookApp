@@ -7,6 +7,18 @@ import config from './src//config';
 
 const app = express()
 
+// Check if the environment is development and set the DynamoDB local endpoint
+const isDevelopment = process.env.NODE_ENV === 'development';
+const dynamoDBOptions: AWS.DynamoDB.ClientConfiguration = {
+  region: config.serviceRegion,
+};
+
+if (isDevelopment) {
+  dynamoDBOptions.endpoint = 'http://localhost:8000';
+  dynamoDBOptions.accessKeyId = 'dummyAccessKeyId'; // Set dummy access key ID
+  dynamoDBOptions.secretAccessKey = 'dummySecretAccessKey'; // Set dummy secret access key
+}
+
 // Initialize DynamoDB client and DataMapper
 const client = new AWS.DynamoDB({ region: config.serviceRegion });
 const mapper = new DataMapper({ client });
