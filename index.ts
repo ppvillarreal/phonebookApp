@@ -14,7 +14,7 @@ const dynamoDBOptions: AWS.DynamoDB.ClientConfiguration = {
 };
 
 if (isDevelopment) {
-  dynamoDBOptions.endpoint = 'http://dynamodb:8000';
+  dynamoDBOptions.endpoint = 'http://dynamodb-local:8000';
   dynamoDBOptions.accessKeyId = 'dummyAccessKeyId'; // Set dummy access key ID
   dynamoDBOptions.secretAccessKey = 'dummySecretAccessKey'; // Set dummy secret access key
 }

@@ -8,8 +8,6 @@ services:
       - dynamodb
     environment:
       NODE_ENV: development
-    networks:
-      - localEnvNetwork
 
   dynamodb:
     image: amazon/dynamodb-local
@@ -18,9 +16,3 @@ services:
     volumes:
       - "./dynamodb:/data"
     command: ["-jar", "DynamoDBLocal.jar", "-sharedDb"]
-    networks:
-      - localEnvNetwork
-
-networks:
-  localEnvNetwork:
-    driver: bridge
