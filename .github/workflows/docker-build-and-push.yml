@@ -6,10 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  ROLE_NAME : "arn:aws:iam::656805403368:role/PhonebookInfraStack-GitHubActionsRole4F1BBA26-noPenIsdZ4qG"
-  AWS_REGION : "us-west-2"
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -24,8 +20,8 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           audience: sts.amazonaws.com
-          aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ env.ROLE_NAME }}
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::656805403368:role/PhonebookInfraStack-GitHubActionsRole4F1BBA26-noPenIsdZ4qG
           role-session-name: github-actions
 
       - name: Login to Amazon ECR
