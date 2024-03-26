@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
-  env:
-    ROLE_NAME : "arn:aws:iam::656805403368:role/PhonebookInfraStack-GitHubActionsRole4F1BBA26-noPenIsdZ4qG"
-    AWS_REGION : "us-west-2"
+
+env:
+  ROLE_NAME : "arn:aws:iam::656805403368:role/PhonebookInfraStack-GitHubActionsRole4F1BBA26-noPenIsdZ4qG"
+  AWS_REGION : "us-west-2"
 
 jobs:
   build-and-push:
