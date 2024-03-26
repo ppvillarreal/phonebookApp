@@ -3,7 +3,7 @@ name: Docker Build and Push
 on:
   push:
     branches:
-      - main  # Change 'main' to your default branch if it's different
+      - main
   env:
     ROLE_NAME : "arn:aws:iam::656805403368:role/PhonebookInfraStack-GitHubActionsRole4F1BBA26-noPenIsdZ4qG"
     AWS_REGION : "us-west-2"
