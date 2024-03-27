@@ -31,7 +31,7 @@ jobs:
       - name: Build, tag, and push Docker image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: 656805403368.dkr.ecr.us-west-2.amazonaws.com/phonebookinfrastack-phonebookrepositorye4baaf95-qganxdxt9ibk"
+          ECR_REPOSITORY: 656805403368.dkr.ecr.us-west-2.amazonaws.com/phonebookinfrastack-phonebookrepositorye4baaf95-qganxdxt9ibk
   # e.g., my-app
           IMAGE_TAG: latest
         run: |
