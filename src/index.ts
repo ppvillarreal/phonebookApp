@@ -19,8 +19,9 @@ interface ContactRequestBody {
     number: string;
 }
 
-app.get('/test', (_request: Request, response: Response) => {
-    response.send('passed test');
+// health check
+app.get('/health', (_request: Request, response: Response) => {
+    response.send('Health check passed');
 });
 
 app.get('/info', async (_request: Request, response: Response): Promise<void> => {
