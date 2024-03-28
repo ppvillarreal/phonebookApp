@@ -19,6 +19,10 @@ interface ContactRequestBody {
     number: string;
 }
 
+app.get('/test', (_request: Request, response: Response) => {
+    response.send('passed test');
+});
+
 app.get('/info', async (_request: Request, response: Response): Promise<void> => {
   let count = 0;
   for await (const _ of mapper.scan(Contact, { 
