@@ -21,7 +21,7 @@ interface ContactRequestBody {
 
 // health check
 app.get('/health', (_request: Request, response: Response) => {
-    response.send('Health check passed');
+    response.send('Health check passed - confirmed');
 });
 
 app.get('/info', async (_request: Request, response: Response): Promise<void> => {
