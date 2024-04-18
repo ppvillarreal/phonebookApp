@@ -43,7 +43,7 @@ app.get('/info', async (_request: Request, response: Response): Promise<void> =>
       count++;
   }
   const message = 
-      `<p>Phonebook has information for ${count} people</p>` +
+      `<p>Phonebook has number information for ${count} people</p>` +
       `<p> ${new Date()} </p>`;
   response.send(message);
 })
