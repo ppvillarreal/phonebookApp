@@ -32,7 +32,6 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: phonebookinfrastack-phonebookrepositorye4baaf95-qganxdxt9ibk
-  # e.g., my-app
           IMAGE_TAG: latest
         run: |
           docker buildx create --use
@@ -54,5 +53,9 @@ jobs:
           role-session-name: github-actions
 
       - name: Deploy new image to Fargate service
-        run: |
-          aws ecs update-service --cluster PhonebookInfraStack-EcsDefaultClusterMnL3mNNYN926A5246-8SM6TbjyHvTk --service PhonebookInfraStack-PhonebookApplicationService9EE5B926-Nz93NfvWh1vG --force-new-deployment
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: PhonebookInfraStackPhonebookApplicationTaskDefA3A5156E
+          service: PhonebookInfraStack-PhonebookApplicationService9EE5B926-Nz93NfvWh1vG
+          cluster: PhonebookInfraStack-EcsDefaultClusterMnL3mNNYN926A5246-8SM6TbjyHvTk
+          wait-for-service-stability: true
