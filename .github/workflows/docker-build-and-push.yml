@@ -59,3 +59,4 @@ jobs:
           service: PhonebookInfraStack-PhonebookApplicationService9EE5B926-Nz93NfvWh1vG
           cluster: PhonebookInfraStack-EcsDefaultClusterMnL3mNNYN926A5246-8SM6TbjyHvTk
           wait-for-service-stability: true
+          force-new-deployment: true
