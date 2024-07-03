@@ -58,32 +58,22 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Update ECS Task Definition
-        id: update-task-def
-        run: |
-          # Fetch the current task definition
-          aws ecs describe-task-definition --task-definition PhonebookInfraStackPhonebookApplicationTaskDefA3A5156E > task-def.json
-          
-          # Update the container image with the latest tag
-          NEW_TASK_DEF=$(jq --arg IMAGE "${{ steps.login-ecr.outputs.registry }}/phonebookinfrastack-phonebookrepositorye4baaf95-qganxdxt9ibk:latest" '
-            .taskDefinition |
-            del(.status, .taskDefinitionArn, .revision, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
-            .containerDefinitions[0].image = $IMAGE
-          ' task-def.json)
-          
-          # Save the new task definition to a file
-          echo "$NEW_TASK_DEF" > new-task-def.json
-          
-          # Register the new task definition
-          aws ecs register-task-definition --cli-input-json file://new-task-def.json
+      - name: Render new ECS task definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: PhonebookInfraStackPhonebookApplicationTaskDefA3A5156E
+          container-name: phonebook-container
+          image: ${{ steps.login-ecr.outputs.registry }}/phonebookinfrastack-phonebookrepositorye4baaf95-qganxdxt9ibk:latest
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           service: PhonebookInfraStack-PhonebookApplicationService9EE5B926-Nz93NfvWh1vG
           cluster: PhonebookInfraStack-EcsDefaultClusterMnL3mNNYN926A5246-8SM6TbjyHvTk
-          task-definition: ${{ steps.update-task-def.outputs.task-definition }}
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
           wait-for-service-stability: true
           force-new-deployment: true
+
 
 
