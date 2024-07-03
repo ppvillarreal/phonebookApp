@@ -67,7 +67,7 @@ jobs:
           aws ecs register-task-definition --cli-input-json file://new-task-def.json
 
       - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-service@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           service: PhonebookInfraStack-PhonebookApplicationService9EE5B926-Nz93NfvWh1vG
           cluster: PhonebookInfraStack-EcsDefaultClusterMnL3mNNYN926A5246-8SM6TbjyHvTk
