@@ -43,6 +43,9 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -51,6 +54,10 @@ jobs:
           role-to-assume: arn:aws:iam::656805403368:role/PhonebookInfraStack-GitHubActionsRole4F1BBA26-noPenIsdZ4qG
           role-session-name: github-actions
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Update ECS Task Definition
         id: update-task-def
         run: |
@@ -58,7 +65,7 @@ jobs:
           aws ecs describe-task-definition --task-definition PhonebookInfraStackPhonebookApplicationTaskDefA3A5156E > task-def.json
           
           # Update the container image with the latest tag
-          NEW_TASK_DEF=$(jq --arg IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY:latest" '
+          NEW_TASK_DEF=$(jq --arg IMAGE "${{ steps.login-ecr.outputs.registry }}/phonebookinfrastack-phonebookrepositorye4baaf95-qganxdxt9ibk:latest" '
             .taskDefinition |
             del(.status, .taskDefinitionArn, .revision, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
             .containerDefinitions[0].image = $IMAGE
@@ -75,7 +82,8 @@ jobs:
         with:
           service: PhonebookInfraStack-PhonebookApplicationService9EE5B926-Nz93NfvWh1vG
           cluster: PhonebookInfraStack-EcsDefaultClusterMnL3mNNYN926A5246-8SM6TbjyHvTk
-          task-definition: PhonebookInfraStackPhonebookApplicationTaskDefA3A5156E
+          task-definition: ${{ steps.update-task-def.outputs.task-definition }}
           wait-for-service-stability: true
           force-new-deployment: true
+
 
