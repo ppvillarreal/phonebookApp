@@ -32,10 +32,9 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: phonebookinfrastack-phonebookrepositorye4baaf95-qganxdxt9ibk
-          IMAGE_TAG: latest
         run: |
           docker buildx create --use
-          docker buildx build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --push .
+          docker buildx build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:latest --push .
 
   deploy:
     needs: build-and-push
@@ -52,11 +51,26 @@ jobs:
           role-to-assume: arn:aws:iam::656805403368:role/PhonebookInfraStack-GitHubActionsRole4F1BBA26-noPenIsdZ4qG
           role-session-name: github-actions
 
-      - name: Deploy new image to Fargate service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      - name: Update ECS Task Definition
+        id: update-task-def
+        run: |
+          # Fetch the current task definition
+          aws ecs describe-task-definition --task-definition PhonebookInfraStackPhonebookApplicationTaskDefA3A5156E > task-def.json
+          
+          # Update the container image with the latest tag
+          NEW_TASK_DEF=$(jq --arg IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY:latest" '.taskDefinition.containerDefinitions[0].image = $IMAGE' task-def.json | jq '.taskDefinition | del(.status, .taskDefinitionArn, .revision, .requiresAttributes, .compatibilities)')
+          
+          # Save the new task definition to a file
+          echo $NEW_TASK_DEF > new-task-def.json
+          
+          # Register the new task definition
+          aws ecs register-task-definition --cli-input-json file://new-task-def.json
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-service@v1
         with:
-          task-definition: PhonebookInfraStackPhonebookApplicationTaskDefA3A5156E
           service: PhonebookInfraStack-PhonebookApplicationService9EE5B926-Nz93NfvWh1vG
           cluster: PhonebookInfraStack-EcsDefaultClusterMnL3mNNYN926A5246-8SM6TbjyHvTk
+          task-definition: PhonebookInfraStackPhonebookApplicationTaskDefA3A5156E
           wait-for-service-stability: true
           force-new-deployment: true
